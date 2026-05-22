@@ -1,0 +1,44 @@
+{
+  "name": "gemini-desktop",
+  "version": "0.1.0",
+  "description": "A Windows desktop shell for Gemini, Google AI Studio, and Google Labs tools.",
+  "main": "src/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "gemini",
+    "google-ai-studio",
+    "desktop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^39.8.10",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "app.gemini.desktop",
+    "productName": "Gemini Desktop",
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

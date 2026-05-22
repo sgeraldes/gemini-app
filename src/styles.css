@@ -1,0 +1,690 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --bg: #151515;
+  --panel: #202020;
+  --border: #343434;
+  --border-soft: #2a2a2a;
+  --text: #ededed;
+  --muted: #a3a3a3;
+  --dim: #737373;
+  --blue: #74a8ff;
+  --green: #65d89b;
+  --shadow: 0 12px 28px rgba(0, 0, 0, 0.62), 0 32px 64px rgba(0, 0, 0, 0.62);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: 38px minmax(0, 1fr);
+  width: 100vw;
+  height: 100vh;
+  border: 1px solid #303030;
+  background: linear-gradient(180deg, #1b1b1b, #141414);
+}
+
+.titlebar {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto minmax(200px, 1fr);
+  align-items: center;
+  min-width: 0;
+  background: #1f1f1f;
+  user-select: none;
+  position: relative;
+  z-index: 10;
+  -webkit-app-region: drag;
+}
+
+/* Legacy hook — kept so existing element doesn't render; drag is handled on .titlebar itself */
+.window-drag-region {
+  display: none;
+}
+
+/*
+ * .brand-block is intentionally NOT listed here. It's a flex container that
+ * stretches to fill its grid cell (~460px on a 1420px window). Marking it
+ * no-drag would punch a hole through the titlebar's drag region across the
+ * entire left half. Its interactive children (.app-icon-button for the menu,
+ * .nav-pill) carry their own -webkit-app-region values, so the empty padding
+ * inside .brand-block — and the .brand-title text — stays draggable.
+ */
+.titlebar-history,
+.titlebar-actions,
+.tool-switcher,
+.app-menu,
+.user-menu,
+.icon-button,
+.app-icon-button,
+.user-button,
+.mode-tab,
+.tool-button {
+  -webkit-app-region: no-drag;
+}
+
+.brand-title {
+  -webkit-app-region: drag;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 6px;
+}
+
+/* The app icon doubles as the menu trigger — standard Windows behaviour where
+   clicking the top-left window icon opens the application/window menu. */
+.app-icon-button {
+  -webkit-app-region: no-drag;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.app-icon-button:hover {
+  background: #303030;
+}
+
+.title-mark {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.brand-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f2f2f2;
+  white-space: nowrap;
+}
+
+.tool-button,
+.icon-button,
+.user-button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 7px;
+  min-height: 28px;
+  cursor: pointer;
+}
+
+.tool-button:hover,
+.icon-button:hover,
+.user-button:hover {
+  background: #303030;
+  color: var(--text);
+}
+
+.icon-button {
+  width: 31px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+/* The centred cluster groups back/forward with the tool switcher so the arrows
+   sit directly to the left of the first tab instead of floating by the brand. */
+.center-cluster {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.nav-pill-button {
+  width: 28px;
+  min-height: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 7px;
+  color: var(--muted);
+}
+
+.nav-pill-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.nav-pill-button:hover:not(:disabled) {
+  background: #303030;
+  color: var(--text);
+}
+
+.nav-pill-button:disabled {
+  color: #4a4a4a;
+  cursor: default;
+  background: transparent;
+}
+
+/* Legacy positioning rule removed — kept selector for any inherited markup */
+.titlebar-history {
+  display: none;
+}
+
+.tool-switcher {
+  position: relative;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  max-width: min(780px, 48vw);
+  min-width: 0;
+  height: 30px;
+  gap: 2px;
+  padding: 1px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #292929;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tool-switcher::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sliding selector. Position + width are driven from renderer.js so it animates
+   between tabs instead of snapping. It sits behind the tab labels (z-index 0). */
+.tab-indicator {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 0;
+  width: 0;
+  z-index: 0;
+  border-radius: 7px;
+  background-color: #454545;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transform: translateX(0);
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 240ms ease, box-shadow 240ms ease, opacity 160ms ease;
+  pointer-events: none;
+}
+
+.custom-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mode-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  min-width: max-content;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 11px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+/* Subtle, monochrome function glyphs (à la Claude Code's Chat/Cowork/Code).
+   They inherit the tab's text colour, so they brighten with the active tab. */
+.tab-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  opacity: 0.8;
+}
+
+.mode-tab.active .tab-icon {
+  opacity: 1;
+}
+
+.mode-tab:hover:not(.active) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mode-tab.active {
+  color: #fff;
+}
+
+/* The add-tool button is an escape hatch, not a tool — separate it with a
+   divider and give it a distinct circular, muted treatment. */
+.add-tool-button {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  margin-left: 5px;
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--dim);
+}
+
+.add-tool-button::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 15px;
+  background: var(--border);
+}
+
+.add-tool-button:hover {
+  background: #373737;
+  color: var(--text);
+}
+
+.titlebar-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+}
+
+.user-button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  margin: 0 10px;
+  padding: 0;
+  border-radius: 50%;
+  background: #2d2d2d;
+  color: #e8e8e8;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.user-button.signed-out-pill {
+  width: auto;
+  min-width: 64px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: #1f6feb;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  overflow: visible;
+}
+
+.user-button.signed-out-pill:hover {
+  background: #2879f6;
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Shown inside the account button while we're signed in but still scraping the
+   Google avatar out of the loaded webview — an animated spinner beats a static
+   "?" that lingers for a beat. */
+.avatar-loading {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #d4d4d4;
+  animation: spin 760ms linear infinite;
+}
+
+.user-menu-info {
+  padding: 8px 10px 10px;
+}
+
+.user-menu-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ededed;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.user-menu-email {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  word-break: break-all;
+}
+
+.titlebar-actions .window-control {
+  position: relative;
+  width: 46px;
+  height: 100%;
+  min-height: 38px;
+  border-radius: 0;
+  color: #cfcfcf;
+}
+
+.window-control::before,
+.window-control::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  transform: translate(-50%, -50%);
+}
+
+.minimize-control::before {
+  width: 10px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.maximize-control::before {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+}
+
+.close-control::before,
+.close-control::after {
+  width: 12px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.close-control::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close-control::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.icon-button.close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+.app-menu,
+.user-menu {
+  position: absolute;
+  z-index: 20;
+  display: none;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #141414;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+}
+
+/*
+ * Dropdown anchoring is finalised in renderer.js (positionMenu) which measures
+ * each trigger and pins the menu directly beneath it. The values below are
+ * sensible fallbacks: the app menu drops under the top-left app icon, the user
+ * menu hangs near the avatar on the right.
+ */
+.app-menu {
+  top: 38px;
+  left: 6px;
+  right: auto;
+}
+
+.user-menu {
+  top: 38px;
+  right: 110px;
+  left: auto;
+  min-width: 220px;
+}
+
+.app-menu.open,
+.user-menu.open {
+  display: grid;
+}
+
+.app-menu button,
+.user-menu button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #ededed;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-menu button:hover,
+.user-menu button:hover {
+  background: #2d2d2d;
+}
+
+.app-menu span {
+  color: var(--dim);
+  font-size: 12px;
+  margin-left: 24px;
+}
+
+.menu-separator {
+  height: 1px;
+  margin: 5px 4px;
+  background: #303030;
+}
+
+.tool-button {
+  padding: 0 11px;
+  background: #282828;
+  border: 1px solid #383838;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.content {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  padding: 3px 10px 10px;
+  background: #1f1f1f;
+}
+
+.browser-frame {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: #0c0c0c;
+  box-shadow: var(--shadow);
+}
+
+/* Active-tool colour propagation: a thin accent line along the top edge of the
+   content frame. --active-accent is set per-tool from renderer.js, and the
+   colour cross-fades when you switch tools. */
+.browser-frame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 4;
+  background: var(--active-accent, transparent);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: background 240ms ease;
+}
+
+.webview-stack,
+.tool-webview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tool-webview {
+  display: none;
+  border: 0;
+  background: #0c0c0c;
+}
+
+.tool-webview.active {
+  display: flex;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  background: radial-gradient(circle at center, rgba(38, 38, 38, 0.96), rgba(13, 13, 13, 0.98));
+  color: #dcdcdc;
+  font-weight: 700;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.loading-overlay.external {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.loading-overlay.external .loader {
+  display: none;
+}
+
+.overlay-action {
+  display: none;
+}
+
+.loader {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #3a3a3a;
+  border-top-color: var(--blue);
+  animation: spin 880ms linear infinite;
+}
+
+.add-tool-dialog {
+  width: min(380px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid #343434;
+  border-radius: 10px;
+  background: #202020;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.add-tool-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.add-tool-dialog form {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.dialog-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.add-tool-dialog input {
+  height: 34px;
+  width: 100%;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #191919;
+  color: #e7e7e7;
+  outline: none;
+}
+
+.add-tool-dialog input:focus {
+  border-color: #5d8fe8;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1120px) {
+  .brand-title {
+    display: none;
+  }
+
+  .titlebar {
+    grid-template-columns: 120px auto 120px;
+  }
+}

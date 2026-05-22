@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self';" />
+    <title>Gemini Desktop</title>
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="titlebar">
+        <div class="brand-block">
+          <button class="app-icon-button" id="appMenuButton" title="Menu" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+            <img class="title-mark" src="./assets/icon.svg" alt="" aria-hidden="true" />
+          </button>
+          <span class="brand-title">Gemini Desktop</span>
+        </div>
+
+        <div class="center-cluster">
+          <div class="nav-pill">
+            <button class="icon-button nav-pill-button" id="backButton" title="Back" aria-label="Back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+            </button>
+            <button class="icon-button nav-pill-button" id="forwardButton" title="Forward" aria-label="Forward">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 5 7 7-7 7" /><path d="M5 12h14" /></svg>
+            </button>
+          </div>
+
+          <div class="tool-switcher" id="toolTabs" role="tablist" aria-label="Google tools">
+            <span class="tab-indicator" id="tabIndicator" aria-hidden="true"></span>
+            <button class="mode-tab active" data-tool="gemini"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg><span>Chat</span></button>
+            <button class="mode-tab" data-tool="studio"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="6" y2="6" /><line x1="10" x2="3" y1="6" y2="6" /><line x1="21" x2="12" y1="12" y2="12" /><line x1="8" x2="3" y1="12" y2="12" /><line x1="21" x2="16" y1="18" y2="18" /><line x1="12" x2="3" y1="18" y2="18" /><circle cx="12" cy="6" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="14" cy="18" r="2" /></svg><span>AI Studio</span></button>
+            <button class="mode-tab" data-tool="pomelli"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" /></svg><span>Pomelli</span></button>
+            <button class="mode-tab" data-tool="jules"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg><span>Jules</span></button>
+            <button class="mode-tab" data-tool="stitch"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M3 9h18" /><path d="M9 21V9" /></svg><span>Stitch</span></button>
+            <span class="custom-tabs" id="customTools"></span>
+            <button class="icon-button add-tool-button" id="addToolButton" title="Add tool" aria-label="Add tool">+</button>
+          </div>
+        </div>
+
+        <div class="titlebar-actions">
+          <button class="user-button" id="userMenuButton" title="Account" aria-label="Account" aria-expanded="false"></button>
+          <button class="icon-button window-control minimize-control" id="minimizeWindow" title="Minimize" aria-label="Minimize"></button>
+          <button class="icon-button window-control maximize-control" id="maximizeWindow" title="Maximize" aria-label="Maximize"></button>
+          <button class="icon-button window-control close close-control" id="closeWindow" title="Close" aria-label="Close"></button>
+        </div>
+
+        <div class="app-menu" id="appMenu" role="menu" aria-label="Application menu">
+          <button role="menuitem" id="menuReload">Reload <span>Ctrl+R</span></button>
+          <button role="menuitem" id="menuOpenExternal">Open in browser</button>
+          <div class="menu-separator"></div>
+          <button role="menuitem" id="menuActualSize">Actual size <span>Ctrl+0</span></button>
+          <button role="menuitem" id="menuZoomIn">Zoom in <span>Ctrl++</span></button>
+          <button role="menuitem" id="menuZoomOut">Zoom out <span>Ctrl+-</span></button>
+          <div class="menu-separator"></div>
+          <button role="menuitem" id="menuDevTools">Open DevTools</button>
+        </div>
+
+        <div class="user-menu" id="userMenu" role="menu" aria-label="Account menu"></div>
+      </header>
+
+      <main class="content">
+        <section class="browser-frame" id="browserFrame">
+          <div class="webview-stack" id="webviewStack"></div>
+          <div class="loading-overlay" id="loadingOverlay">
+            <div class="loader"></div>
+            <span>Loading Gemini</span>
+          </div>
+        </section>
+      </main>
+
+      <dialog class="add-tool-dialog" id="addToolDialog">
+        <form id="customToolForm" method="dialog">
+          <div class="dialog-title">Add Google tool</div>
+          <input id="customToolName" type="text" placeholder="Name" aria-label="Custom tool name" />
+          <input id="customToolUrl" type="url" placeholder="https://..." aria-label="Custom tool URL" />
+          <div class="dialog-actions">
+            <button class="tool-button" id="cancelAddTool" type="button">Cancel</button>
+            <button class="tool-button" type="submit">Add</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
